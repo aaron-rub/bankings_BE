@@ -7,14 +7,17 @@
 </head>
 
 <body>
-<th:block layout:fragment="body" th:remove="tag">
-    <!-- Start of body content specific to page -->
-    <div class="px-4 py-5 my-5">
-        <h3 class="display-5 fw-bold">Birds</h3>
-    </div>
-    <!-- End of body content specific to page -->
-</th:block>
-</body>
+
+    <h2>Daily Income Form</h2>
+    
+    <form action="#" th:action="@{/submitIncome}" method="post">
+      <label for="income">Daily Income:</label><br>
+      <input type="number" id="income" name="income" required><br>
+      <input type="submit" value="Submit">
+    </form> 
+    
+    </body>
+    </html>
 
 <th:block layout:fragment="script" th:remove="tag">
 <!-- Start of custom script specific to page -->
