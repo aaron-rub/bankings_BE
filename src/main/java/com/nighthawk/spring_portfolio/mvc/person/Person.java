@@ -120,6 +120,17 @@ public class Person {
         this.password = password;
     }
 
+    public JSONObject getStats() {
+        return this.stats;
+    }
+
+    public addStat(String date, int income, int spending ) {
+        JSONObject day;
+        day.put("income", income);
+        day.put("spending", spending);
+        this.stats.put(date, day);
+    }
+
     // Initialize static test data 
     public static Person[] init() {
 
