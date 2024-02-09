@@ -131,6 +131,10 @@ public class Person {
         this.stats.put(date, day);
     }
 
+    public setStats(Map<String, Map<String, Object>> day_map) {
+        this.stats = day_map;
+    }
+
     // Initialize static test data 
     public static Person[] init() {
 
