@@ -96,7 +96,7 @@ public class Person {
         return this.name;
     }
 
-    public setName(String name) {
+    public void setName(String name) {
         this.name = name;
     }
 
@@ -104,7 +104,7 @@ public class Person {
         return this.email;
     }
 
-    public setEmail(String email) {
+    public void setEmail(String email) {
         this.email = email;
     }
 
@@ -112,11 +112,11 @@ public class Person {
         return this.name;
     }
 
-    public setName(String name) {
+    public void setName(String name) {
         this.name = name;
     }
 
-    public setPassword(int password) {
+    public void setPassword(int password) {
         this.password = password;
     }
 
@@ -124,14 +124,14 @@ public class Person {
         return this.stats;
     }
 
-    public addStat(String date, int income, int spending ) {
+    public void addStat(String date, int income, int spending ) {
         JSONObject day;
         day.put("income", income);
         day.put("spending", spending);
         this.stats.put(date, day);
     }
 
-    public setStats(Map<String, Map<String, Object>> day_map) {
+    public void setStats(Map<String, Map<String, Object>> day_map) {
         this.stats = day_map;
     }
 
