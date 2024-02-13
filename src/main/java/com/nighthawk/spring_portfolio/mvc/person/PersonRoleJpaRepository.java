@@ -6,5 +6,5 @@ public interface  PersonRoleJpaRepository extends JpaRepository<PersonRole, Long
     @Query(
             value = "SELECT * FROM Person_roles p WHERE p.person_id = :name",
             nativeQuery = true)
-    PersonRole findByName(String name)
+    PersonRole findByName(String name);
 }
