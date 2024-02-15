@@ -90,6 +90,11 @@ public class Person {
         this.email = email;
         this.password = password;
         this.name = name;
+        JSONObject balance = new JSONObject();
+        balance.put("balance",0);
+        this.stats.put("balance", balance);
+        JSONObject catergories = new JSONObject();
+        this.stats.put("catergories", catergories);
     }
 
     public String getName() {

@@ -144,4 +144,18 @@ public class PersonApiController {
         // Bad ID
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST); 
     }
+
+    @PostMapping(value = "/addAmount/{id}/{amount}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> addBalance(@RequestBody final Map<String,String> map) {
+        // locate the users
+        Optional<Person> optional = repository.findById(id);
+        if (optional.isPresent()) {  // Good ID
+            Person user = optional.get();
+            int current = user.stats.get("balance").getInt("balance");
+            current += amount;
+            user.stats.get("balance").set("balance", current);
+            return new ResponseEntity<>(user.stats.get("balance"), HttpStatus.OK);  // OK HTTP response: status code, headers, and body
+        }
+        // Bad ID
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST); 
 }
