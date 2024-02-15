@@ -154,8 +154,22 @@ public class PersonApiController {
             int current = user.stats.get("balance").getInt("balance");
             current += amount;
             user.stats.get("balance").set("balance", current);
-            return new ResponseEntity<>(user.stats.get("balance"), HttpStatus.OK);  // OK HTTP response: status code, headers, and body
+            return new ResponseEntity<>(user.stats, HttpStatus.OK);  // OK HTTP response: status code, headers, and body
         }
         // Bad ID
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST); 
 }
+
+    @PostMapping(value = "/addCatergory/{id}/{name}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> addCatergory(@RequestBody final Map<String,String> map) {
+        // locate the users
+        Optional<Person> optional = repository.findById(id);
+        if (optional.isPresent()) {  // Good ID
+            Person user = optional.get();
+            user.stats.get("catergories").put(name,0);
+            return new ResponseEntity<>(user.stats, HttpStatus.OK);  // OK HTTP response: status code, headers, and body
+        }
+        // Bad ID
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST); 
+}
+
