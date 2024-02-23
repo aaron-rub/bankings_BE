@@ -171,7 +171,7 @@ public class PersonApiController {
         }
         // Bad ID
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST); 
-}
+} 
 
     @PostMapping(value = "/addAmountCatergory/{id}/{name}/{amount}", produces = MediaType.APPLICATION_JSON_VALUE)
         public ResponseEntity<Object> addCatergory(@RequestBody final Map<String,String> map) {
@@ -180,6 +180,9 @@ public class PersonApiController {
             if (optional.isPresent()) {  // Good ID
                 Person user = optional.get();
                 user.stats.get("catergories").set(name,amount);
+                int current = user.stats.get("balance").getInt("balance");
+                current -= amount;
+                user.stats.get("balance").set("balance", current);
                 return new ResponseEntity<>(user.stats, HttpStatus.OK);  // OK HTTP response: status code, headers, and body
             }
             // Bad ID
