@@ -48,6 +48,17 @@ public class PersonApiController {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);       
     }
 
+    @GetMapping("/stats/{id}")
+    public ResponseEntity<Object> getPerson(@PathVariable long id) {
+        Optional<Person> optional = repository.findById(id);
+        if (optional.isPresent()) {  // Good ID
+            Person person = optional.get();  // value from findByID
+            return new ResponseEntity<>(person.stats, HttpStatus.OK);  // OK HTTP response: status code, headers, and body
+        }
+        // Bad ID
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);       
+    }
+
     /*
     DELETE individual Person using ID
      */
@@ -137,7 +148,7 @@ public class PersonApiController {
             current = user2.stats.get("balance").getInt("balance");
             current += amount;
             user2.stats.get("balance").set("balance", current);
-            return new ResponseEntity<>(transfered, HttpStatus.OK);  // OK HTTP response: status code, headers, and body
+            return new ResponseEntity<>(user2.stats, HttpStatus.OK);  // OK HTTP response: status code, headers, and body
         }
         // Bad ID
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST); 
