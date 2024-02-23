@@ -123,7 +123,7 @@ public class PersonApiController {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST); 
     }
 
-    @PostMapping(value = "/transfer/{id1}/{id2}/{day}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/transfer/{id1}/{id2}/{amount}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> personSearch(@RequestBody final Map<String,String> map) {
         // locate the users
         Optional<Person> optional1 = repository.findById(id1);
@@ -131,14 +131,12 @@ public class PersonApiController {
         if (optional1.isPresent() && optional2.isPresent()) {  // Good ID
             Person user1 = optional1.get();  // value from findByID
             Person user2 = optional2.get();
-            for (Map.Entry<String,Object> entry : user.stat_map.entrySet())  {
-                if (entry.getKey().equals("date")) {
-                    Map<String, Object> transfered = new HashMap<>();
-                    transfered.put(entry.getKey(), entry.getValue());
-                    user2.stat_map.putAll(transfered);
-                    user1.stat_map.remove(entry.getKey());
-                }
-            }
+            int current = user1.stats.get("balance").getInt("balance");
+            current -= amount;
+            user1.stats.get("balance").set("balance", current);
+            current = user2.stats.get("balance").getInt("balance");
+            current += amount;
+            user2.stats.get("balance").set("balance", current);
             return new ResponseEntity<>(transfered, HttpStatus.OK);  // OK HTTP response: status code, headers, and body
         }
         // Bad ID
