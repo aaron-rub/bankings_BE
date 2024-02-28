@@ -30,7 +30,7 @@ public class ModelInit {
             String[] jokesArray = Jokes.init();
             for (String joke : jokesArray) {
                 List<Jokes> jokeFound = jokesRepo.findByJokeIgnoreCase(joke);  // JPA lookup
-                if (jokeFound.size() == 0)
+                if (jokeFound.isEmpty())
                     jokesRepo.save(new Jokes(null, joke, 0, 0)); //JPA save
             }
 
@@ -39,7 +39,7 @@ public class ModelInit {
             for (Person person : personArray) {
                 //findByNameContainingIgnoreCaseOrEmailContainingIgnoreCase
                 List<Person> personFound = personService.list(person.getName(), person.getEmail());  // lookup
-                if (personFound.size() == 0) {
+                if (personFound.isEmpty()) {
                     personService.save(person);  // save
 
                     // Each "test person" starts with a "test note"

@@ -1,13 +1,22 @@
 package com.nighthawk.spring_portfolio.mvc.person;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.*;
-import java.text.SimpleDateFormat;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/person")
@@ -49,11 +58,11 @@ public class PersonApiController {
     }
 
     @GetMapping("/stats/{id}")
-    public ResponseEntity<Object> getPerson(@PathVariable long id) {
+    public ResponseEntity<Object> getStatsPerson(@PathVariable long id) {
         Optional<Person> optional = repository.findById(id);
         if (optional.isPresent()) {  // Good ID
             Person person = optional.get();  // value from findByID
-            return new ResponseEntity<>(person.stats, HttpStatus.OK);  // OK HTTP response: status code, headers, and body
+            return new ResponseEntity<>(person.getStats(), HttpStatus.OK);  // OK HTTP response: status code, headers, and body
         }
         // Bad ID
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);       
@@ -102,100 +111,59 @@ public class PersonApiController {
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
-    /*
-    The personStats API adds stats by Date to Person table 
-    */
-    @PostMapping(value = "/setStats", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Person> personStats(@RequestBody final Map<String,Object> stat_map) {
-        // find ID
-        long id=Long.parseLong((String)stat_map.get("id"));  
-        Optional<Person> optional = repository.findById((id));
-        if (optional.isPresent()) {  // Good ID
-            Person person = optional.get();  // value from findByID
-
-            // Extract Attributes from JSON
-            Map<String, Object> attributeMap = new HashMap<>();
-            for (Map.Entry<String,Object> entry : stat_map.entrySet())  {
-                // Add all attribute other thaN "date" to the "attribute_map"
-                if (!entry.getKey().equals("date") && !entry.getKey().equals("id"))
-                    attributeMap.put(entry.getKey(), entry.getValue());
-            }
-
-            // Set Date and Attributes to SQL HashMap
-            Map<String, Map<String, Object>> date_map = new HashMap<>();
-            date_map.put( (String) stat_map.get("date"), attributeMap );
-            person.setStats(date_map);  // BUG, needs to be customized to replace if existing or append if new
-            repository.save(person);  // conclude by writing the stats updates
-
-            // return Person with update Stats
-            return new ResponseEntity<>(person, HttpStatus.OK);
-        }
-        // return Bad ID
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST); 
-    }
-
     @PostMapping(value = "/transfer/{id1}/{id2}/{amount}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> personSearch(@RequestBody final Map<String,String> map) {
+    public ResponseEntity<Object> personSearch(@RequestBody Long id1, @RequestBody Long id2, @RequestBody int amount) {
         // locate the users
         Optional<Person> optional1 = repository.findById(id1);
         Optional<Person> optional2 = repository.findById(id2);
         if (optional1.isPresent() && optional2.isPresent()) {  // Good ID
             Person user1 = optional1.get();  // value from findByID
             Person user2 = optional2.get();
-            int current = user1.stats.get("balance").getInt("balance");
-            current -= amount;
-            user1.stats.get("balance").set("balance", current);
-            current = user2.stats.get("balance").getInt("balance");
-            current += amount;
-            user2.stats.get("balance").set("balance", current);
-            return new ResponseEntity<>(user2.stats, HttpStatus.OK);  // OK HTTP response: status code, headers, and body
+            user1.addBalance(-amount);
+            user2.addBalance(amount);
+            return new ResponseEntity<>(user2.getStats(), HttpStatus.OK);  // OK HTTP response: status code, headers, and body
         }
         // Bad ID
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST); 
     }
 
     @PostMapping(value = "/addAmount/{id}/{amount}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> addBalance(@RequestBody final Map<String,String> map) {
+    public ResponseEntity<Object> addBalance(@RequestBody Long id, @RequestBody int amount) {
         // locate the users
         Optional<Person> optional = repository.findById(id);
         if (optional.isPresent()) {  // Good ID
             Person user = optional.get();
-            int current = user.stats.get("balance").getInt("balance");
-            current += amount;
-            user.stats.get("balance").set("balance", current);
-            return new ResponseEntity<>(user.stats, HttpStatus.OK);  // OK HTTP response: status code, headers, and body
+            user.addBalance(amount);
+            return new ResponseEntity<>(user.getStats(), HttpStatus.OK);  // OK HTTP response: status code, headers, and body
         }
         // Bad ID
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST); 
 }
 
     @PostMapping(value = "/addCatergory/{id}/{name}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> addCatergory(@RequestBody final Map<String,String> map) {
+    public ResponseEntity<Object> addCatergory(@RequestBody Long id, @RequestBody String name) {
         // locate the users
         Optional<Person> optional = repository.findById(id);
         if (optional.isPresent()) {  // Good ID
             Person user = optional.get();
-            user.stats.get("catergories").put(name,0);
-            return new ResponseEntity<>(user.stats, HttpStatus.OK);  // OK HTTP response: status code, headers, and body
+            user.addCatergory(name);
+            return new ResponseEntity<>(user.getStats(), HttpStatus.OK);  // OK HTTP response: status code, headers, and body
         }
         // Bad ID
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST); 
 } 
 
     @PostMapping(value = "/addAmountCatergory/{id}/{name}/{amount}", produces = MediaType.APPLICATION_JSON_VALUE)
-        public ResponseEntity<Object> addCatergory(@RequestBody final Map<String,String> map) {
+        public ResponseEntity<Object> addCatergory(@RequestBody Long id, @RequestBody String name, @RequestBody int amount) {
             // locate the users
             Optional<Person> optional = repository.findById(id);
             if (optional.isPresent()) {  // Good ID
                 Person user = optional.get();
-                user.stats.get("catergories").set(name,amount);
-                int current = user.stats.get("balance").getInt("balance");
-                current -= amount;
-                user.stats.get("balance").set("balance", current);
-                return new ResponseEntity<>(user.stats, HttpStatus.OK);  // OK HTTP response: status code, headers, and body
+                user.addMoneyToCatergory(name, amount);
+                return new ResponseEntity<>(user.getStats(), HttpStatus.OK);  // OK HTTP response: status code, headers, and body
             }
             // Bad ID
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST); 
-    }
+    }}
 
 

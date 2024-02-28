@@ -1,33 +1,28 @@
 package com.nighthawk.spring_portfolio.mvc.person;
 
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.Period;
-import java.time.ZoneId;
+import static jakarta.persistence.FetchType.EAGER;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
+import com.vladmihalcea.hibernate.type.json.JsonType;
+
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
-import jakarta.persistence.Convert;
-import static jakarta.persistence.FetchType.EAGER;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
-
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
-import org.springframework.format.annotation.DateTimeFormat;
-
-import com.vladmihalcea.hibernate.type.json.JsonType;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -82,27 +77,19 @@ public class Person {
     */
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
-    private Map<String,Map<String, Object>> stats = new HashMap<>(); 
+    private Map<String,Map<String, Integer>> stats = new HashMap<>(); 
     
 
     // Constructor used when building object from an API
-    public Person(String email, String password, String name, Date dob) {
+    public Person(String email, String password, String name) {
         this.email = email;
         this.password = password;
         this.name = name;
-        JSONObject balance = new JSONObject();
+        Map<String, Integer> balance = new HashMap<>();
         balance.put("balance",0);
         this.stats.put("balance", balance);
-        JSONObject catergories = new JSONObject();
+        Map<String, Integer> catergories = new HashMap<>();
         this.stats.put("catergories", catergories);
-    }
-
-    public String getName() {
-        return this.name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public String getEmail() {
@@ -121,23 +108,24 @@ public class Person {
         this.name = name;
     }
 
-    public void setPassword(int password) {
-        this.password = password;
-    }
-
-    public JSONObject getStats() {
+    public Map<String,Map<String, Integer>> getStats() {
         return this.stats;
     }
 
-    public void addStat(String date, int income, int spending ) {
-        JSONObject day;
-        day.put("income", income);
-        day.put("spending", spending);
-        this.stats.put(date, day);
+    public void addBalance(int amount) {
+        int current = this.stats.get("balance").get("balance");
+        this.stats.get("balance").put("balance",current+amount);
     }
 
-    public void setStats(Map<String, Map<String, Object>> day_map) {
-        this.stats = day_map;
+    public void addCatergory(String name) {
+        this.stats.get("catergories").put(name,0);
+    }
+
+    public void addMoneyToCatergory(String name, int amount) {
+        int current = this.stats.get("balance").get("balance");
+        this.stats.get("balance").put("balance",current-amount);
+        current = this.stats.get("catergories").get(name);
+        this.stats.get("catergories").put(name,current+amount);
     }
 
     // Initialize static test data 
